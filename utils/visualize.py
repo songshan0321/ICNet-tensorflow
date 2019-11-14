@@ -17,6 +17,11 @@ label_colours = [[128, 64, 128], [244, 35, 231], [69, 69, 69]
                 ,[119, 10, 32]]
                 # 18 = bicycle
 
+lb_label_colours = [[128, 64, 128], [244, 35, 231], [69, 69, 69]
+                # 0 = wall, 1 = floor, 2 = ceiling
+                ,[102, 102, 156], [190, 153, 153]]
+                # 3 = human, 4 = obstacles
+
 matfn = './utils/color150.mat'
 def read_labelcolours(matfn):
     mat = sio.loadmat(matfn)
@@ -29,6 +34,8 @@ def read_labelcolours(matfn):
 def decode_labels(mask, img_shape, num_classes):
     if num_classes == 150:
         color_table = read_labelcolours(matfn)
+    elif num_classes == 5:
+        color_table = lb_label_colours
     else:
         color_table = label_colours
 

@@ -5,6 +5,7 @@ class Config(object):
     # Setting dataset directory
     CITYSCAPES_DATA_DIR = './data/cityscapes_dataset/cityscape/'
     ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
+    LB_ADE20K_DATA_DIR = './data/LB_ADE20K/'
       
     ADE20K_eval_list = os.path.join('./data/list/ade20k_val_list.txt')
     CITYSCAPES_eval_list = os.path.join('./data/list/cityscapes_val_list.txt')
@@ -17,7 +18,7 @@ class Config(object):
     ADE20k_param = {'name': 'ade20k',
                 'num_classes': 150, # predict: [0~149] corresponding to label [1~150], ignore class 0 (background) 
                 'ignore_label': 0,
-                'eval_size': [480, 480],
+                'eval_size': [480, 640],
                 'eval_steps': 2000,
                 'eval_list': ADE20K_eval_list,
                 'train_list': ADE20K_train_list,
@@ -36,20 +37,20 @@ class Config(object):
               'trainval': './model/cityscapes/icnet_cityscapes_trainval_90k.npy',
               'train_bn': './model/cityscapes/icnet_cityscapes_train_30k_bnnomerge.npy',
               'trainval_bn': './model/cityscapes/icnet_cityscapes_trainval_90k_bnnomerge.npy',
-              'others': './model/ade20k/model.ckpt-27150'}
+              'others': './snapshots/2/model.ckpt-5000'}
     
     ## If you want to train on your own dataset, try to set these parameters.
-    others_param = {'name': 'YOUR_OWN_DATASET',
-                    'num_classes': 0,
-                    'ignore_label': 0,
-                    'eval_size': [0, 0],
-                    'eval_steps': 0,
-                    'eval_list': '/PATH/TO/YOUR_EVAL_LIST',
-                    'train_list': '/PATH/TO/YOUR_TRAIN_LIST',
-                    'data_dir': '/PATH/TO/YOUR_DATA_DIR'}
+    others_param = {'name': 'lb_ade20k',
+                    'num_classes': 5,
+                    'ignore_label': 255,
+                    'eval_size': [480, 640],
+                    'eval_steps': 2000,
+                    'eval_list': ADE20K_eval_list,
+                    'train_list': ADE20K_train_list,
+                    'data_dir': LB_ADE20K_DATA_DIR}
 
     ## You can modify following lines to train different training configurations.
-    INFER_SIZE = [1024, 2048, 3] 
+    INFER_SIZE = [480, 640, 3] 
     TRAINING_SIZE = [720, 720] 
     TRAINING_STEPS = 60001
     

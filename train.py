@@ -9,6 +9,9 @@ import time
 import tensorflow as tf
 import numpy as np
 
+import matplotlib
+import matplotlib.pyplot as plt
+
 from model import ICNet_BN
 from utils.config import Config
 from utils.visualize import decode_labels
@@ -79,6 +82,7 @@ class TrainConfig(Config):
     # Set pre-trained weights here (You can download weight using `python script/download_weights.py`) 
     # Note that you need to use "bnnomerge" version.
     model_weight = './model/cityscapes/icnet_cityscapes_train_30k_bnnomerge.npy'
+    # model_weight = './model/ade20k/model.ckpt-27150.index'
     
     # Set hyperparameters here, you can get much more setting in Config Class, see 'utils/config.py' for details.
     LAMBDA1 = 0.16
@@ -126,7 +130,8 @@ def main():
     learning_rate = tf.scalar_mul(base_lr, tf.pow((1 - step_ph / cfg.TRAINING_STEPS), cfg.POWER))
     
     # Set restore variable 
-    restore_var = tf.global_variables()
+    # restore_var = tf.global_variables()
+    restore_var = [v for v in tf.global_variables() if 'conv6_cls' not in v.name]
     all_trainable = [v for v in tf.trainable_variables() if ('beta' not in v.name and 'gamma' not in v.name) or args.train_beta_gamma]
 
     # Gets moving_mean and moving_variance update operations from tf.GraphKeys.UPDATE_OPS
@@ -142,8 +147,23 @@ def main():
     
     # Create session & restore weights (Here we only need to use train_net to create session since we reuse it)
     train_net.create_session()
+    print("Restoring weights ...")
     train_net.restore(cfg.model_weight, restore_var)
     saver = tf.train.Saver(var_list=tf.global_variables(), max_to_keep=5)
+
+    # Losses for plotting
+    train_loss_list = []
+    val_loss_list = []
+    avg_train_loss_list = []
+    avg_val_loss_list = []
+    steps = []
+
+    fig,ax = plt.subplots(1,1)
+    line1, = ax.plot(steps, train_loss_list, 'b--', linewidth=0.5)
+    line2, = ax.plot(steps, val_loss_list, 'g-', linewidth=0.5)
+    line1.set_label('Train Loss')
+    line2.set_label('Val Loss')
+    ax.legend()
 
     # Iterate over training steps.
     for step in range(cfg.TRAINING_STEPS):
@@ -153,13 +173,26 @@ def main():
         if step % cfg.SAVE_PRED_EVERY == 0:
             loss_value, loss1, loss2, loss3, val_loss_value, _ = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss, train_op], feed_dict=feed_dict)
             train_net.save(saver, cfg.SNAPSHOT_DIR, step)
+            plt.savefig('snapshots/loss.png')
         else:
             loss_value, loss1, loss2, loss3, val_loss_value, _ = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss, train_op], feed_dict=feed_dict)            
 
         duration = time.time() - start_time
         print('step {:d} \t total loss = {:.3f}, sub4 = {:.3f}, sub24 = {:.3f}, sub124 = {:.3f}, val_loss: {:.3f} ({:.3f} sec/step)'.\
                     format(step, loss_value, loss1, loss2, loss3, val_loss_value, duration))
-    
-    
+        
+        # Plot
+        train_loss_list.append(loss_value)
+        val_loss_list.append(val_loss_value)
+
+        if step % 50 == 0 and step != 0:
+            steps.append(step)
+            avg_train_loss_list.append(sum(train_loss_list[-49:] + [loss_value])/50.0)
+            avg_val_loss_list.append(sum(val_loss_list[-49:] + [val_loss_value])/50.0)
+            line1, = ax.plot(steps, avg_train_loss_list, 'b--', linewidth=0.5)
+            line2, = ax.plot(steps, avg_val_loss_list, 'g-', linewidth=0.5)
+            fig.canvas.draw()
+            plt.show(block=False)
+
 if __name__ == '__main__':
     main()

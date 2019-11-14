@@ -100,17 +100,18 @@ class Network(object):
         '''
         data_dict = np.load(data_path, encoding='latin1').item()
         for op_name in data_dict:
-            with tf.variable_scope(op_name, reuse=True):
-                for param_name, data in data_dict[op_name].items():
-                    try:
-                        if 'bn' in op_name:
-                            param_name = BN_param_map[param_name]
+            if op_name != 'conv6_cls': # Hardcoded to make it transfer learning
+                with tf.variable_scope(op_name, reuse=True):
+                    for param_name, data in data_dict[op_name].items():
+                        try:
+                            if 'bn' in op_name:
+                                param_name = BN_param_map[param_name]
 
-                        var = tf.get_variable(param_name)
-                        session.run(var.assign(data))
-                    except ValueError:
-                        if not ignore_missing:
-                            raise
+                            var = tf.get_variable(param_name)
+                            session.run(var.assign(data))
+                        except ValueError:
+                            if not ignore_missing:
+                                raise
 
     def feed(self, *args):
         '''Set the input(s) for the next operation by replacing the terminal nodes.
