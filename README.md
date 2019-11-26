@@ -45,26 +45,6 @@ bash script/download_ADE20k.sh
 ```
 
 ## Get started! <a name="get-started"></a>
-### Inference on your own image<a name="inference"></a>
-[demo.ipynb](./demo.ipynb) to run semantic segmnetation on your own image. 
-
-In the end of [demo.ipynb](./demo.ipynb), you can test the speed of ICNet.
-
-
-
-### Evaluate on your trained dataset <a name="evaluation"></a>
-To get the results, you need to follow the steps mentioned above to download dataset first.  
-Then you need to change the `data_dir` path in [config.py](./utils/config.py#L6).
-
-```python
-ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
-```
-
-Run following command to get evaluation results,
-```
-python evaluate.py --dataset=others --filter-scale=1 --model=others
-```
-
 ## Training on your own dataset <a name="training"></a>
 This implementation is different from the details descibed in ICNet paper, since I did not re-produce model compression part. Instead, we **train on the half kernels directly**.  
 
@@ -73,7 +53,23 @@ In orignal paper, the authod trained the model in full kernels and then performe
 For example, `--filter-scale=1` <-> `[h, w, 32]` and `--filter-scale=2` <-> `[h, w, 64]`. 
 
 ### Step by Step
-**1. Change the configurations** in [utils/config.py](./utils/config.py).
+
+**1. Define class mapping** in [relabel.py](relabel.py). (key is new class id, value is a list of original class id from ADE20K)
+
+```bash
+# Define relabel mapping here, e.g. {0:[1,2], 1:[3,4]}
+self.map_list = {0: [4,7,12,14,29,30,53,55]}
+```
+
+**2. Create a new relabeled ADE20K** using [relabel.py](relabel.py). It will be created at [data/LB_ADE20K](data/LB_ADE20K).
+
+```bash
+python relabel.py
+# copy original images to the new dataset folder
+cp -r data/ADEChallengeData2016/images data/LB_ADE20K/images
+```
+
+**3. Change the configurations** in [utils/config.py](./utils/config.py).
 
 ```python
 others_param = {'name': 'lb_ade20k',
@@ -86,7 +82,7 @@ others_param = {'name': 'lb_ade20k',
                     'data_dir': LB_ADE20K_DATA_DIR}
 ```
 
-**2. Set Hyperparameters** in `train.py`, 
+**4. Set Hyperparameters** in `train.py`, 
 
 ```python
 class TrainConfig(Config):
@@ -108,14 +104,47 @@ class TrainConfig(Config):
     LEARNING_RATE = 5e-4
 ```
 
-**3.** Run following command and **decide whether to update mean/var or train beta/gamma variable**.
+**5.** Run following command and **decide whether to update mean/var or train beta/gamma variable**.
+
 ```
 python train.py --update-mean-var --train-beta-gamma --random-scale --random-mirror --dataset others --filter-scale 1
 ```
 
 **Note: Be careful to use `--update-mean-var`!** Use this flag means you will update the moving mean and moving variance in batch normalization layer. This **need large batch size**, otherwise it will lead bad results. 
 
+### Inference on your own image using your trained model<a name="inference"></a>
 
+[demo.ipynb](./demo.ipynb) to run semantic segmnetation on your own image. 
+
+In the end of [demo.ipynb](./demo.ipynb), you can test the speed of ICNet.
+
+**1. Set label color in ** using [relabel.py](relabel.py).
+
+```bash
+# --------------- Set label color here -------------------
+lb_label_colours = [[244, 35, 231], [128, 64, 128]]
+                # 0 = floor, 1 = obstacles
+# --------------------------------------------------------
+```
+
+
+
+### Evaluate on your trained dataset <a name="evaluation"></a>
+
+To get the results, you need to follow the steps mentioned above to download dataset first.  
+Then you need to change the `data_dir` path in [config.py](./utils/config.py#L6).
+
+```python
+ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
+```
+
+Run following command to get evaluation results,
+
+```
+python evaluate.py --dataset=others --filter-scale=1 --model=others
+```
+
+## 
 
 ## Citation
     @article{zhao2017icnet,
