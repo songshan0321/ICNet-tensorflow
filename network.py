@@ -100,7 +100,7 @@ class Network(object):
         '''
         data_dict = np.load(data_path, encoding='latin1').item()
         for op_name in data_dict:
-            if op_name != 'conv6_cls': # Hardcoded to make it transfer learning
+            if op_name != 'conv6_cls': # Ignre last layer for transfer learning
                 with tf.variable_scope(op_name, reuse=True):
                     for param_name, data in data_dict[op_name].items():
                         try:

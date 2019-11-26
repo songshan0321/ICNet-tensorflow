@@ -33,7 +33,7 @@ def get_arguments():
                         choices=['cityscapes', 'ade20k', 'others'])
     parser.add_argument("--filter-scale", type=int, default=1,
                         help="1 for using pruned model, while 2 for using non-pruned model.",
-                        choices=[1, 2])
+                        choices=[1, 2])                
     return parser.parse_args()
 
 def get_mask(gt, num_classes, ignore_label):
@@ -79,17 +79,23 @@ class TrainConfig(Config):
     def __init__(self, dataset, is_training,  filter_scale=1, random_scale=None, random_mirror=None):
         Config.__init__(self, dataset, is_training, filter_scale, random_scale, random_mirror)
 
-    # Set pre-trained weights here (You can download weight using `python script/download_weights.py`) 
-    # Note that you need to use "bnnomerge" version.
-    model_weight = './model/cityscapes/icnet_cityscapes_train_30k_bnnomerge.npy'
-    # model_weight = './model/ade20k/model.ckpt-27150.index'
+    # --------------- Set pre-trained weights here ----------------
+    ## To train on pretrained weight on cityscapes
+    model_weight = './model/cityscapes/icnet_cityscapes_trainval_90k_bnnomerge.npy'
+    ## or To further train on your own checkpoint
+    # model_weight = './snapshots/model.ckpt-1000'
+    # -------------------------------------------------------------
     
     # Set hyperparameters here, you can get much more setting in Config Class, see 'utils/config.py' for details.
-    LAMBDA1 = 0.16
-    LAMBDA2 = 0.4
+    LAMBDA1 = 0.4
+    LAMBDA2 = 0.6
     LAMBDA3 = 1.0
     BATCH_SIZE = 8
     LEARNING_RATE = 5e-4
+
+def check_ckpt(save_model_path):
+    from tensorflow.python.tools import inspect_checkpoint as chkp
+    chkp.print_tensors_in_checkpoint_file(save_model_path, tensor_name='', all_tensors=True)
 
 def main():
     """Create the model and start the training."""
@@ -144,8 +150,11 @@ def main():
         opt_conv = tf.train.MomentumOptimizer(learning_rate, cfg.MOMENTUM)
         grads = tf.gradients(reduced_loss, all_trainable)
         train_op = opt_conv.apply_gradients(zip(grads, all_trainable))
+
+    # check_ckpt(cfg.model_weight)
     
     # Create session & restore weights (Here we only need to use train_net to create session since we reuse it)
+    # tf.reset_default_graph() 
     train_net.create_session()
     print("Restoring weights ...")
     train_net.restore(cfg.model_weight, restore_var)
@@ -164,6 +173,7 @@ def main():
     line1.set_label('Train Loss')
     line2.set_label('Val Loss')
     ax.legend()
+    plt.grid()
 
     # Iterate over training steps.
     for step in range(cfg.TRAINING_STEPS):

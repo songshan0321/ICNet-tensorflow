@@ -37,7 +37,7 @@ class Config(object):
               'trainval': './model/cityscapes/icnet_cityscapes_trainval_90k.npy',
               'train_bn': './model/cityscapes/icnet_cityscapes_train_30k_bnnomerge.npy',
               'trainval_bn': './model/cityscapes/icnet_cityscapes_trainval_90k_bnnomerge.npy',
-              'others': './snapshots/2/model.ckpt-5000'}
+              'others': './snapshots/15/model.ckpt-25500'}
     
     ## If you want to train on your own dataset, try to set these parameters.
     others_param = {'name': 'lb_ade20k',
@@ -51,11 +51,11 @@ class Config(object):
 
     ## You can modify following lines to train different training configurations.
     INFER_SIZE = [480, 640, 3] 
-    TRAINING_SIZE = [720, 720] 
+    TRAINING_SIZE = [480, 640] 
     TRAINING_STEPS = 60001
     
     N_WORKERS = 8
-    BATCH_SIZE = 16
+    BATCH_SIZE = 8
     LEARNING_RATE = 1e-4
     MOMENTUM = 0.9
     POWER = 0.9
