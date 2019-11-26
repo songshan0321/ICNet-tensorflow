@@ -113,10 +113,6 @@ python train.py --update-mean-var --train-beta-gamma --random-scale --random-mir
 
 ### Inference using your trained model<a name="inference"></a>
 
-[demo.ipynb](./demo.ipynb) to run semantic segmnetation on your own image. 
-
-In the end of [demo.ipynb](./demo.ipynb), you can test the speed of ICNet.
-
 **1. Set label color** in [relabel.py](relabel.py).
 
 ```python
@@ -125,6 +121,10 @@ lb_label_colours = [[244, 35, 231], [128, 64, 128]]
                 # 0 = floor, 1 = obstacles
 # --------------------------------------------------------
 ```
+
+**2. [demo.ipynb](./demo.ipynb) to run semantic segmnetation** on your own image. 
+
+In the end of [demo.ipynb](./demo.ipynb), you can test the speed of ICNet.
 
 
 
