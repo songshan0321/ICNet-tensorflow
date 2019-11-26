@@ -1,7 +1,7 @@
-# ICNet_tensorflow
-ICNet Tensorflow for ADE20K Indoor Images
+# ICNet Tensorflow for ADE20K Indoor Images
+This repo is modified based on [hellochick/ICNet-tensorflow](https://github.com/hellochick/ICNet-tensorflow) which provides a TensorFlow-based implementation of paper "[ICNet for Real-Time Semantic Segmentation on High-Resolution Images](https://arxiv.org/abs/1704.08545)," by Hengshuang Zhao, and et. al. (ECCV'18).
 
-Changes:
+Changes from the original repo:
 
 - Added [relabel.py](relabel.py) to do class relabeling.
 - Added graph plotting during training. 
@@ -9,7 +9,7 @@ Changes:
 
 
 
-This repo is modified based on [hellochick/ICNet-tensorflow](https://github.com/hellochick/ICNet-tensorflow) which provides a TensorFlow-based implementation of paper "[ICNet for Real-Time Semantic Segmentation on High-Resolution Images](https://arxiv.org/abs/1704.08545)," by Hengshuang Zhao, and et. al. (ECCV'18).
+
 
 
 
