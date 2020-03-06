@@ -3,18 +3,31 @@ import os
 
 class Config(object):
     # Setting dataset directory
+    MAPILLARY_DATA_DIR = './data/mapillary/'
     CITYSCAPES_DATA_DIR = './data/cityscapes_dataset/cityscape/'
     ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
     LB_ADE20K_DATA_DIR = './data/LB_ADE20K/'
       
+    MAPILLARY_eval_list = os.path.join('./data/list/mapillary_val_list.txt')
     ADE20K_eval_list = os.path.join('./data/list/ade20k_val_list.txt')
     CITYSCAPES_eval_list = os.path.join('./data/list/cityscapes_val_list.txt')
     
+    MAPILLARY_train_list = os.path.join('./data/list/mapillary_train_list.txt')
     ADE20K_train_list = os.path.join('./data/list/ade20k_train_list.txt')
     CITYSCAPES_train_list = os.path.join('./data/list/cityscapes_train_list.txt')
     
     IMG_MEAN = np.array((103.939, 116.779, 123.68), dtype=np.float32)
     
+    mapillary_param = {'name': 'mapillary',
+                    'num_classes': 19,
+                    'ignore_label': 255,
+                    'eval_size': [1025, 2049],
+                    'eval_steps': 500,
+                    'eval_list': CITYSCAPES_eval_list,
+                    'train_list': CITYSCAPES_train_list,
+                    'data_dir': CITYSCAPES_DATA_DIR}
+
+
     ADE20k_param = {'name': 'ade20k',
                 'num_classes': 150, # predict: [0~149] corresponding to label [1~150], ignore class 0 (background) 
                 'ignore_label': 0,
