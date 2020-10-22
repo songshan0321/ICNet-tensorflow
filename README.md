@@ -1,7 +1,7 @@
-# ICNet_tensorflow
-ICNet Tensorflow for ADE20K Indoor Images
+# ICNet Tensorflow for ADE20K Indoor Images
+This repo is modified based on [hellochick/ICNet-tensorflow](https://github.com/hellochick/ICNet-tensorflow) which provides a TensorFlow-based implementation of paper "[ICNet for Real-Time Semantic Segmentation on High-Resolution Images](https://arxiv.org/abs/1704.08545)," by Hengshuang Zhao, and et. al. (ECCV'18).
 
-Changes:
+Changes from the original repo:
 
 - Added [relabel.py](relabel.py) to do class relabeling.
 - Added graph plotting during training. 
@@ -9,7 +9,7 @@ Changes:
 
 
 
-This repo is modified based on [hellochick/ICNet-tensorflow](https://github.com/hellochick/ICNet-tensorflow) which provides a TensorFlow-based implementation of paper "[ICNet for Real-Time Semantic Segmentation on High-Resolution Images](https://arxiv.org/abs/1704.08545)," by Hengshuang Zhao, and et. al. (ECCV'18).
+
 
 
 
@@ -18,12 +18,11 @@ This repo is modified based on [hellochick/ICNet-tensorflow](https://github.com/
 - [Download Weights](#download-weights)
 - [Download Dataset](#download-dataset)
   + [ade20k](#download-ade20k)
-  + [cityscapes](#download-cityscapes)
 - [Get Started!](#get-started)
-  + [Inference on your own image](#inference)
-  + [Evaluate on cityscapes/ade20k dataset](#evaluation)
   + [Training on your own dataset](#training)
-  
+  + [Inference using your trained model](#inference)
+  + [Evaluate your trained model](#evaluation)
+
 ## Environment Setup <a name="environment"></a>
 ```
 pip install tensorflow-gpu opencv-python jupyter matplotlib tqdm
@@ -56,7 +55,7 @@ For example, `--filter-scale=1` <-> `[h, w, 32]` and `--filter-scale=2` <-> `[h,
 
 **1. Define class mapping** in [relabel.py](relabel.py). (key is new class id, value is a list of original class id from ADE20K)
 
-```bash
+```python
 # Define relabel mapping here, e.g. {0:[1,2], 1:[3,4]}
 self.map_list = {0: [4,7,12,14,29,30,53,55]}
 ```
@@ -112,24 +111,24 @@ python train.py --update-mean-var --train-beta-gamma --random-scale --random-mir
 
 **Note: Be careful to use `--update-mean-var`!** Use this flag means you will update the moving mean and moving variance in batch normalization layer. This **need large batch size**, otherwise it will lead bad results. 
 
-### Inference on your own image using your trained model<a name="inference"></a>
+### Inference using your trained model<a name="inference"></a>
 
-[demo.ipynb](./demo.ipynb) to run semantic segmnetation on your own image. 
+**1. Set label color** in [relabel.py](relabel.py).
 
-In the end of [demo.ipynb](./demo.ipynb), you can test the speed of ICNet.
-
-**1. Set label color in ** using [relabel.py](relabel.py).
-
-```bash
+```python
 # --------------- Set label color here -------------------
 lb_label_colours = [[244, 35, 231], [128, 64, 128]]
                 # 0 = floor, 1 = obstacles
 # --------------------------------------------------------
 ```
 
+**2. [demo.ipynb](./demo.ipynb) to run semantic segmnetation** on your own image. 
+
+In the end of [demo.ipynb](./demo.ipynb), you can test the speed of ICNet.
 
 
-### Evaluate on your trained dataset <a name="evaluation"></a>
+
+### Evaluate your trained dataset <a name="evaluation"></a>
 
 To get the results, you need to follow the steps mentioned above to download dataset first.  
 Then you need to change the `data_dir` path in [config.py](./utils/config.py#L6).
